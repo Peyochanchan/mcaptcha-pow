@@ -1,11 +1,13 @@
 import { afterEach, describe, expect, test } from "bun:test"
 import { solve } from "../src/solve.js"
+import { solve as solveAuto } from "../src/auto.js"
 import { ChallengeError, SolveError, VerifyError } from "../src/errors.js"
 import { solveChallenge } from "../src/pow.js"
 import { stubInstance } from "./support/instance_stub.js"
 
 const instanceUrl = "https://mcaptcha.example.org"
 const sitekey = "a-sitekey"
+const workerUrl = "/assets/mcaptcha-pow-worker-0123abcd.js"
 const challenge = { salt: "a-salt-long-enough-for-mcaptcha", string: "a-challenge", difficulty_factor: 500 }
 
 const originalWorker = globalThis.Worker
@@ -35,7 +37,7 @@ describe("solve", () => {
     const requests = instanceAnswering({ token: "a-token" })
     const workers = stubWorker()
 
-    expect(await solve({ instanceUrl, sitekey })).toBe("a-token")
+    expect(await solve({ instanceUrl, sitekey, workerUrl })).toBe("a-token")
 
     const [config, verify] = requests
     expect(config).toMatchObject({ path: "/api/v1/pow/config", body: { key: sitekey } })
@@ -44,30 +46,36 @@ describe("solve", () => {
     expect(workers[0].terminated).toBe(true)
   })
 
-  test("starts a module worker from the package by default", async () => {
+  test("starts a module worker from workerUrl", async () => {
     instanceAnswering({ token: "a-token" })
     const workers = stubWorker()
 
-    await solve({ instanceUrl, sitekey })
+    await solve({ instanceUrl, sitekey, workerUrl })
 
-    expect(String(workers[0].url)).toEndWith("/src/worker.js")
+    expect(workers[0].url).toBe(workerUrl)
     expect(workers[0].options).toEqual({ type: "module" })
   })
 
-  test("starts the worker from workerUrl when given", async () => {
+  test("requires workerUrl, before calling the instance", async () => {
+    const requests = instanceAnswering({ token: "a-token" })
+
+    await expect(solve({ instanceUrl, sitekey })).rejects.toThrow(/workerUrl is required/)
+    expect(requests).toHaveLength(0)
+  })
+
+  test("mcaptcha-pow/auto starts the worker shipped with the package", async () => {
     instanceAnswering({ token: "a-token" })
     const workers = stubWorker()
 
-    await solve({ instanceUrl, sitekey, workerUrl: "/assets/mcaptcha-pow-worker.js" })
-
-    expect(workers[0].url).toBe("/assets/mcaptcha-pow-worker.js")
+    expect(await solveAuto({ instanceUrl, sitekey })).toBe("a-token")
+    expect(String(workers[0].url)).toEndWith("/src/worker.js")
   })
 
   test("fails with a ChallengeError when the instance answers an error", async () => {
     stubInstance({ "/api/v1/pow/config": { status: 503, json: {} } })
     const workers = stubWorker()
 
-    await expect(solve({ instanceUrl, sitekey })).rejects.toBeInstanceOf(ChallengeError)
+    await expect(solve({ instanceUrl, sitekey, workerUrl })).rejects.toBeInstanceOf(ChallengeError)
     expect(workers).toHaveLength(0)
   })
 
@@ -75,14 +83,14 @@ describe("solve", () => {
     instanceAnswering({})
     stubWorker()
 
-    await expect(solve({ instanceUrl, sitekey })).rejects.toBeInstanceOf(VerifyError)
+    await expect(solve({ instanceUrl, sitekey, workerUrl })).rejects.toBeInstanceOf(VerifyError)
   })
 
   test("fails with a SolveError when the worker crashes", async () => {
     instanceAnswering({ token: "a-token" })
     const workers = stubWorker(worker => worker.onerror({ message: "boom" }))
 
-    await expect(solve({ instanceUrl, sitekey })).rejects.toThrow(new SolveError("boom"))
+    await expect(solve({ instanceUrl, sitekey, workerUrl })).rejects.toThrow(new SolveError("boom"))
     expect(workers[0].terminated).toBe(true)
   })
 
@@ -91,7 +99,7 @@ describe("solve", () => {
     const controller = new AbortController()
     const workers = stubWorker(() => controller.abort())
 
-    await expect(solve({ instanceUrl, sitekey, signal: controller.signal })).rejects.toThrow("aborted")
+    await expect(solve({ instanceUrl, sitekey, workerUrl, signal: controller.signal })).rejects.toThrow("aborted")
     expect(workers[0].terminated).toBe(true)
   })
 })

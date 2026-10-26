@@ -32,7 +32,7 @@ export default class extends Controller {
       this.tokenTarget.value = await solve({
         instanceUrl: this.instanceUrlValue,
         sitekey: this.sitekeyValue,
-        workerUrl: this.workerUrlValue || undefined,
+        workerUrl: this.workerUrlValue,
         signal: this.pending.signal
       })
       this.announce(this.solvedValue, "solved")

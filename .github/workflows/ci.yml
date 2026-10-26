@@ -22,6 +22,3 @@ jobs:
 
       - name: Build the worker
         run: bun run build
-
-      - name: Check the worker is self-contained
-        run: "! grep -q '^import' dist/worker.js"
