@@ -53,9 +53,11 @@ About 2.2 million hashes per second. For comparison, a straightforward loop awai
 
 ## Install
 
-Not published to npm yet. Until then, vendor it: copy `src/` into your app, and build the self-contained worker with `bun run build` (it lands in `dist/worker.js`).
+```sh
+npm install mcaptcha-pow
+```
 
-No dependencies: ES modules, and a worker that imports nothing.
+No dependencies: ES modules, and a self-contained worker, `dist/worker.js`, that imports nothing.
 
 ### Browser support
 
