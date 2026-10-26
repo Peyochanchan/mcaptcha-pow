@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.js",
+    "./auto": "./src/auto.js",
     "./worker.js": "./dist/worker.js"
   },
   "files": [

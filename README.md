@@ -9,7 +9,11 @@ Solve [mCaptcha](https://mcaptcha.org) proof-of-work challenges in the browser, 
 ```js
 import { solve } from "mcaptcha-pow"
 
-const token = await solve({ instanceUrl: "https://mcaptcha.example.org", sitekey: "…" })
+const token = await solve({
+  instanceUrl: "https://mcaptcha.example.org",
+  sitekey: "…",
+  workerUrl: "/assets/mcaptcha-pow-worker.js" // dist/worker.js, served by your app
+})
 // submit the token with the form, verify it on your server
 ```
 
@@ -55,30 +59,36 @@ No dependencies. The package ships ES modules and a self-contained worker, `dist
 
 ### The worker
 
-`solve` starts the worker with `new Worker(new URL("./worker.js", import.meta.url), { type: "module" })`. Vite and webpack recognise this pattern and bundle the worker for you.
+The proof of work runs in a Web Worker, which the browser only loads from your own origin. Serve `dist/worker.js` with your assets and pass its URL as `workerUrl`. There is no default URL on purpose: guessing one would need `import.meta`, a syntax error in the classic scripts many bundles are loaded as, and it would break every script on the page.
 
-Other bundlers, such as esbuild or Bun (Rails' `jsbundling-rails`), leave it as is. Serve the self-contained worker yourself and pass its URL:
-
-```sh
-cp node_modules/mcaptcha-pow/dist/worker.js public/mcaptcha-pow-worker.js
-```
+**Rails with jsbundling (Bun, esbuild), or any bundle loaded as a classic script.** Copy the worker into the build output, from your build script:
 
 ```js
-await solve({ instanceUrl, sitekey, workerUrl: "/mcaptcha-pow-worker.js" })
+await Bun.write("app/assets/builds/mcaptcha-pow-worker.js", Bun.file("node_modules/mcaptcha-pow/dist/worker.js"))
 ```
 
-Serve it from your own origin: browsers refuse workers from another origin.
+Propshaft or Sprockets then serve it under a digested name, so browsers never keep a stale version. Pass `asset_path("mcaptcha-pow-worker.js")` to the page (see the [Rails example](#rails-example)).
+
+**Vite, webpack.** Import from `mcaptcha-pow/auto` and leave `workerUrl` out: these bundlers find the worker and emit it for you.
+
+```js
+import { solve } from "mcaptcha-pow/auto"
+
+const token = await solve({ instanceUrl, sitekey })
+```
+
+`mcaptcha-pow/auto` uses `import.meta`: only use it in a bundle loaded as a module.
 
 ## API
 
-### `solve({ instanceUrl, sitekey, signal?, workerUrl? })`
+### `solve({ instanceUrl, sitekey, workerUrl, signal? })`
 
 Fetches a challenge, solves it in a worker, and resolves with the token.
 
 - `instanceUrl`: the instance, with or without a trailing slash, possibly under a subpath.
 - `sitekey`: the sitekey of your site on that instance. It is public.
+- `workerUrl`: where your app serves `dist/worker.js` (see above). Required: without it, `solve` rejects with a `TypeError` before calling the instance.
 - `signal`: an `AbortSignal`. Aborting stops the worker and rejects with the signal's reason.
-- `workerUrl`: where to load the worker from (see above).
 
 It rejects with:
 
@@ -135,7 +145,7 @@ Fail closed: the instance answers `200` for an invalid token too, so accept the 
 
 ## Rails example
 
-[`examples/`](examples) holds a complete integration, adapted from one running in production:
+[`examples/`](examples) holds a complete Rails integration:
 
 - [`stimulus/mcaptcha_controller.js`](examples/stimulus/mcaptcha_controller.js): solves when the box is ticked, holds the submission until a token is in, announces each state to screen readers.
 - [`rails/_mcaptcha.html.erb`](examples/rails/_mcaptcha.html.erb), [`mcaptcha_helper.rb`](examples/rails/mcaptcha_helper.rb), [`mcaptcha.en.yml`](examples/rails/mcaptcha.en.yml): the widget markup, rendered by the server, with translated labels.
@@ -163,7 +173,7 @@ end
 
 ```sh
 bun install
-bun test               # protocol, SHA-256 against node:crypto, live vectors
+bun test               # protocol, SHA-256 against node:crypto, live vectors, classic-script bundles
 bun run bench
 bun run build          # dist/worker.js
 bun run capture <instance-url> <sitekey>   # add a vector accepted by a live instance

@@ -4,19 +4,24 @@ import { fetchChallenge, redeemProof } from "./instance.js"
 // Gets a challenge from the mCaptcha instance, solves it off the main thread,
 // and trades the proof for a token. The token is what your form submits, and
 // what your server checks with /api/v1/pow/siteverify.
-export async function solve({ instanceUrl, sitekey, signal, workerUrl }) {
-  const challenge = await fetchChallenge({ instanceUrl, sitekey, signal })
-  const solution = await runWorker(createWorker(workerUrl), challenge, signal)
-  return redeemProof({ instanceUrl, sitekey, challenge, solution, signal })
+//
+// `workerUrl` is where your app serves dist/worker.js. There is no default:
+// resolving one would need `import.meta`, which is a syntax error in the
+// classic scripts many bundles are loaded as. With Vite or webpack, import
+// from "mcaptcha-pow/auto" instead, which bundles the worker for you.
+export function solve({ instanceUrl, sitekey, workerUrl, signal }) {
+  if (!workerUrl) {
+    return Promise.reject(new TypeError(
+      'workerUrl is required: serve dist/worker.js and pass its URL, or import from "mcaptcha-pow/auto" with Vite or webpack'
+    ))
+  }
+  return solveWithWorker(() => new Worker(workerUrl, { type: "module" }), { instanceUrl, sitekey, signal })
 }
 
-// Vite and webpack bundle the worker only when they find `new URL(…,
-// import.meta.url)` written inside `new Worker(…)`: keep it inline. Bun and
-// esbuild leave it as is; there, serve dist/worker.js and pass its URL.
-function createWorker(workerUrl) {
-  return workerUrl
-    ? new Worker(workerUrl, { type: "module" })
-    : new Worker(new URL("./worker.js", import.meta.url), { type: "module" })
+export async function solveWithWorker(createWorker, { instanceUrl, sitekey, signal }) {
+  const challenge = await fetchChallenge({ instanceUrl, sitekey, signal })
+  const solution = await runWorker(createWorker(), challenge, signal)
+  return redeemProof({ instanceUrl, sitekey, challenge, solution, signal })
 }
 
 function runWorker(worker, challenge, signal) {
