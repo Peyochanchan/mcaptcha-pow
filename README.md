@@ -25,6 +25,8 @@ Its official widget is an iframe served by the instance. Self-hosted instances u
 
 This package talks to the instance API directly and solves the challenge in a Web Worker: no iframe, no header to relax, and the form keeps its own look.
 
+It runs in production on the contact form of a Rails site: Bun bundle loaded as a classic script, assets served by Sprockets, and a Content Security Policy with `worker-src 'self'`, without `blob:`.
+
 ## How it works
 
 1. `POST /api/v1/pow/config` returns a challenge: a salt, a string, and a difficulty factor.
@@ -38,9 +40,9 @@ The proof of work is the one of the Rust crate behind mCaptcha (`pow_sha256`), r
 
 SHA-256 runs synchronously in the worker, and the constant part of the input (salt and string) is hashed once: each attempt only hashes its last block. That is what the Rust implementation does too.
 
-Average time per challenge, on an Apple Silicon Mac (`bun run bench`, `node scripts/bench.js`):
+Average time per challenge, on an Apple Silicon Mac, measured with Bun for JavaScriptCore (Safari's engine) and Node for V8 (Chrome's): `bun run bench`, `node scripts/bench.js`.
 
-| Difficulty | JavaScriptCore (Safari) | V8 (Chrome) |
+| Difficulty | JavaScriptCore | V8 |
 |---:|---:|---:|
 | 10 000 | 5 ms | 5 ms |
 | 50 000 | 12 ms | 11 ms |
@@ -51,11 +53,13 @@ About 2.2 million hashes per second. For comparison, a straightforward loop awai
 
 ## Install
 
-```sh
-npm install mcaptcha-pow
-```
+Not published to npm yet. Until then, vendor it: copy `src/` into your app, and build the self-contained worker with `bun run build` (it lands in `dist/worker.js`).
 
-No dependencies. The package ships ES modules and a self-contained worker, `dist/worker.js`.
+No dependencies: ES modules, and a worker that imports nothing.
+
+### Browser support
+
+Module workers are required: Chrome and Edge 80, Safari 15, Firefox 114 and later. Tested in Chromium-based browsers so far.
 
 ### The worker
 
