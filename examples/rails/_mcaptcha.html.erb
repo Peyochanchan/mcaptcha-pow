@@ -1,0 +1,7 @@
+<%# The widget, rendered inside a form that carries the mcaptcha controller (see the README). %>
+<div class="mcaptcha">
+  <input type="checkbox" id="mcaptcha-check" data-mcaptcha-target="check" data-action="change->mcaptcha#solve">
+  <label for="mcaptcha-check"><%= t("mcaptcha.label") %></label>
+  <span role="status" aria-live="polite" data-mcaptcha-target="status"></span>
+  <input type="hidden" name="mcaptcha__token" data-mcaptcha-target="token">
+</div>

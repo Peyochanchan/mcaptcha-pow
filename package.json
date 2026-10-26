@@ -1,0 +1,37 @@
+{
+  "name": "mcaptcha-pow",
+  "version": "0.1.0",
+  "description": "Solve mCaptcha proof-of-work challenges in the browser, without the iframe widget",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./worker.js": "./dist/worker.js"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "test": "bun test",
+    "build": "bun build src/worker.js --outfile dist/worker.js --target browser",
+    "prepack": "bun run build",
+    "capture": "bun scripts/capture-vector.js",
+    "bench": "bun scripts/bench.js"
+  },
+  "keywords": [
+    "mcaptcha",
+    "captcha",
+    "proof-of-work",
+    "pow",
+    "web-worker",
+    "privacy"
+  ],
+  "author": "Pierre Cherbero <cameleon24@outlook.fr>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Peyochanchan/mcaptcha-pow.git"
+  },
+  "homepage": "https://github.com/Peyochanchan/mcaptcha-pow#readme",
+  "bugs": "https://github.com/Peyochanchan/mcaptcha-pow/issues"
+}

@@ -1,0 +1,7 @@
+en:
+  mcaptcha:
+    label: "I'm not a robot"
+    solving: "Checking…"
+    solved: "Verified"
+    failed: "Check failed, please try again"
+    required: "Please tick the box before sending."

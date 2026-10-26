@@ -1,0 +1,37 @@
+[
+  {
+    "salt": "29d637bf8de5c306c3884cc7549868d9fd60f333cac4faecf35caf47ea5d0cde",
+    "string": "jiiNV9RLJIOfdXcfSzruqAoEINyJHwrw",
+    "difficultyFactor": 50000,
+    "nonce": 11835,
+    "result": "340276289102722268147508553104974140537"
+  },
+  {
+    "salt": "29d637bf8de5c306c3884cc7549868d9fd60f333cac4faecf35caf47ea5d0cde",
+    "string": "2Mhz4t5wx1ITGVtqjeAjvrfOzz141p6C",
+    "difficultyFactor": 50000,
+    "nonce": 18576,
+    "result": "340275598585119519077456394391840310607"
+  },
+  {
+    "salt": "29d637bf8de5c306c3884cc7549868d9fd60f333cac4faecf35caf47ea5d0cde",
+    "string": "7KNTKEySkjsLl29ggsP7tAJDmLQEYK0i",
+    "difficultyFactor": 50000,
+    "nonce": 24128,
+    "result": "340281043316721291892506669833026122240"
+  },
+  {
+    "salt": "29d637bf8de5c306c3884cc7549868d9fd60f333cac4faecf35caf47ea5d0cde",
+    "string": "txCCdupXG4dWl77QyG2V1GxIVqwzf9ig",
+    "difficultyFactor": 50000,
+    "nonce": 28121,
+    "result": "340282116044370413696854778164236144678"
+  },
+  {
+    "salt": "29d637bf8de5c306c3884cc7549868d9fd60f333cac4faecf35caf47ea5d0cde",
+    "string": "YXHNTeFneaIIn44STFNyLHruwUETT76i",
+    "difficultyFactor": 50000,
+    "nonce": 35230,
+    "result": "340277752524891801707663258215446148312"
+  }
+]
