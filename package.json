@@ -1,6 +1,6 @@
 {
   "name": "mcaptcha-pow",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Solve mCaptcha proof-of-work challenges in the browser, without the iframe widget",
   "type": "module",
   "exports": {

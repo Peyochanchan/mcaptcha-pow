@@ -1,5 +1,6 @@
 # mcaptcha-pow
 
+[![npm](https://img.shields.io/npm/v/mcaptcha-pow)](https://www.npmjs.com/package/mcaptcha-pow)
 [![CI](https://github.com/Peyochanchan/mcaptcha-pow/actions/workflows/ci.yml/badge.svg)](https://github.com/Peyochanchan/mcaptcha-pow/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Dependencies: none](https://img.shields.io/badge/dependencies-none-brightgreen)
