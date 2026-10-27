@@ -1,11 +1,17 @@
 {
   "name": "mcaptcha-pow",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Solve mCaptcha proof-of-work challenges in the browser, without the iframe widget",
   "type": "module",
   "exports": {
-    ".": "./src/index.js",
-    "./auto": "./src/auto.js",
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./auto": {
+      "types": "./src/auto.d.ts",
+      "default": "./src/auto.js"
+    },
     "./worker.js": "./dist/worker.js"
   },
   "files": [
@@ -34,5 +40,6 @@
     "url": "git+https://github.com/Peyochanchan/mcaptcha-pow.git"
   },
   "homepage": "https://github.com/Peyochanchan/mcaptcha-pow#readme",
-  "bugs": "https://github.com/Peyochanchan/mcaptcha-pow/issues"
+  "bugs": "https://github.com/Peyochanchan/mcaptcha-pow/issues",
+  "types": "./src/index.d.ts"
 }
