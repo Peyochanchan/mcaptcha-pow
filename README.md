@@ -50,7 +50,7 @@ Average time per challenge, on an Apple Silicon Mac, measured with Bun for JavaS
 | 200 000 | 62 ms | 59 ms |
 | 1 000 000 | 734 ms | 631 ms |
 
-About 2.2 million hashes per second. For comparison, a straightforward loop awaiting `crypto.subtle.digest` once per nonce needs about 400 ms at difficulty 50 000.
+About 2.2 million hashes per second. For comparison, a straightforward loop awaiting `crypto.subtle.digest` once per nonce needs 200 to 400 ms at difficulty 50 000.
 
 ## Install
 
@@ -58,11 +58,11 @@ About 2.2 million hashes per second. For comparison, a straightforward loop awai
 npm install mcaptcha-pow
 ```
 
-No dependencies: ES modules, and a self-contained worker, `dist/worker.js`, that imports nothing.
+No dependencies: ES modules with TypeScript types, and a self-contained worker, `dist/worker.js`, that imports nothing.
 
 ### Browser support
 
-Module workers are required: Chrome and Edge 80, Safari 15, Firefox 114 and later. Tested in Chromium-based browsers so far.
+Module workers are required: Chrome and Edge 80, Safari 15, Firefox 114 and later. Tested in production with Chromium-based browsers and Safari.
 
 ### The worker
 
@@ -186,6 +186,16 @@ bun run build          # dist/worker.js
 bun run capture <instance-url> <sitekey>   # add a vector accepted by a live instance
 ```
 
+## Changelog
+
+See the [releases](https://github.com/Peyochanchan/mcaptcha-pow/releases).
+
+## Security
+
+The package only produces a token: the protection rests on the `siteverify` check on your server (see [Verify on the server](#verify-on-the-server)).
+
+To report a vulnerability, please do not open a public issue: use [private vulnerability reporting](https://github.com/Peyochanchan/mcaptcha-pow/security/advisories/new) on GitHub.
+
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) © 2026 Pierre Cherbero
