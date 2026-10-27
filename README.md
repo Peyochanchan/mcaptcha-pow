@@ -52,6 +52,8 @@ Average time per challenge, on an Apple Silicon Mac, measured with Bun for JavaS
 
 About 2.2 million hashes per second. For comparison, a straightforward loop awaiting `crypto.subtle.digest` once per nonce needs 200 to 400 ms at difficulty 50 000.
 
+The official [`@mcaptcha/pow-wasm`](https://www.npmjs.com/package/@mcaptcha/pow-wasm), the Rust implementation compiled to WebAssembly, is faster: about 25 % less time per challenge in V8 (9 ms instead of 12 ms at difficulty 50 000), and it finds the same nonces. This package trades that margin for plain JavaScript: no `'wasm-unsafe-eval'` in your `script-src`, a 5.6 kB worker instead of 74 kB of WebAssembly, and no bundler support for `.wasm` files to set up.
+
 ## Install
 
 ```sh
